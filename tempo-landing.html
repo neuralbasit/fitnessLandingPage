@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tempo — Train to your rhythm</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  :root{
+    --ink:#11131A;
+    --ink-2:#181B24;
+    --paper:#F2F0EA;
+    --paper-dim:#C9C6BE;
+    --pulse:#FF4D6D;
+    --cyan:#4EE1FF;
+    --line:rgba(242,240,234,0.14);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  a{color:inherit;text-decoration:none;}
+
+  .display{font-family:'Archivo Black',sans-serif; letter-spacing:-0.01em;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+
+  /* NAV */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 32px;
+    background:rgba(17,19,26,0.72);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .logo{font-family:'Archivo Black',sans-serif;font-size:20px;letter-spacing:0.02em;display:flex;align-items:center;gap:10px;}
+  .logo-dot{width:9px;height:9px;border-radius:50%;background:var(--pulse);box-shadow:0 0 12px var(--pulse);animation:beat 1.1s ease-in-out infinite;}
+  @keyframes beat{0%,100%{transform:scale(1);}25%{transform:scale(1.5);}40%{transform:scale(0.9);}}
+  .nav-links{display:flex;gap:36px;font-size:14px;color:var(--paper-dim);}
+  .nav-links a:hover{color:var(--paper);}
+  .nav-cta{
+    font-size:13px;font-weight:600;padding:10px 20px;border-radius:999px;
+    background:var(--paper);color:var(--ink);
+  }
+  @media (max-width:820px){.nav-links{display:none;}}
+
+  /* HERO */
+  header.hero{
+    position:relative;min-height:100vh;
+    display:flex;flex-direction:column;justify-content:center;
+    padding-top:110px;padding-bottom:60px;
+    overflow:hidden;
+  }
+  .hero-inner{position:relative;z-index:2;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:0.14em;
+    color:var(--cyan);text-transform:uppercase;margin-bottom:22px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:'';width:22px;height:1px;background:var(--cyan);}
+
+  h1.hero-title{
+    font-size:clamp(48px,8vw,104px);
+    line-height:0.94;
+    text-transform:uppercase;
+    max-width:920px;
+  }
+  h1.hero-title span{color:var(--pulse);}
+
+  .hero-sub{
+    max-width:480px;margin-top:28px;font-size:17px;line-height:1.6;color:var(--paper-dim);
+  }
+  .hero-actions{display:flex;gap:16px;margin-top:40px;flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--pulse);color:var(--ink);font-weight:700;font-size:14.5px;
+    padding:15px 28px;border-radius:999px;display:inline-flex;align-items:center;gap:8px;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,77,109,0.35);}
+  .btn-ghost{
+    border:1px solid var(--line);color:var(--paper);font-weight:600;font-size:14.5px;
+    padding:15px 28px;border-radius:999px;transition:border-color .2s ease, background .2s ease;
+  }
+  .btn-ghost:hover{border-color:var(--paper-dim);background:rgba(242,240,234,0.05);}
+
+  /* waveform */
+  .wave-holder{
+    position:absolute;left:0;right:0;bottom:0;height:220px;z-index:1;opacity:0.9;
+  }
+  .wave-holder svg{width:100%;height:100%;}
+  .wave-path{
+    fill:none;stroke:var(--pulse);stroke-width:2.4;
+    stroke-dasharray:2400;stroke-dashoffset:2400;
+    animation:draw 3.2s ease-out forwards, travel 4s linear infinite 3.2s;
+  }
+  .wave-path.cyan{stroke:var(--cyan);opacity:0.5;stroke-width:1.6;animation-delay:.15s, 3.35s;}
+  @keyframes draw{to{stroke-dashoffset:0;}}
+  @keyframes travel{
+    0%{stroke-dashoffset:0;}
+    100%{stroke-dashoffset:-2400;}
+  }
+
+  /* live stat strip */
+  .strip{
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:22px 0;overflow:hidden;position:relative;background:var(--ink-2);
+  }
+  .strip-track{display:flex;gap:64px;white-space:nowrap;animation:scroll 22s linear infinite;width:max-content;}
+  .strip-item{font-family:'JetBrains Mono',monospace;font-size:13.5px;color:var(--paper-dim);display:flex;align-items:baseline;gap:10px;}
+  .strip-item b{color:var(--paper);font-size:15px;}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* SECTION GENERIC */
+  section{padding:140px 0;position:relative;}
+  .section-head{max-width:640px;margin-bottom:72px;}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--cyan);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px;}
+  .section-head h2{font-size:clamp(32px,4.2vw,52px);text-transform:uppercase;line-height:1.05;}
+  .section-head p{margin-top:20px;color:var(--paper-dim);font-size:16px;line-height:1.6;max-width:520px;}
+
+  /* TRAINING BLOCKS (features) */
+  .blocks{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden;}
+  .block{background:var(--ink);padding:44px 34px;transition:background .25s ease;}
+  .block:hover{background:var(--ink-2);}
+  .block-rep{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:26px;}
+  .block h3{font-size:21px;margin-bottom:12px;font-weight:700;}
+  .block p{color:var(--paper-dim);font-size:14.5px;line-height:1.6;}
+  @media (max-width:900px){.blocks{grid-template-columns:1fr;}}
+
+  /* HOW IT WORKS */
+  .flow{display:flex;flex-direction:column;gap:0;}
+  .flow-row{
+    display:grid;grid-template-columns:90px 1fr 1fr;gap:24px;
+    padding:36px 0;border-top:1px solid var(--line);align-items:center;
+  }
+  .flow-row:last-child{border-bottom:1px solid var(--line);}
+  .flow-tempo{font-family:'JetBrains Mono',monospace;color:var(--pulse);font-size:14px;}
+  .flow-row h4{font-size:22px;font-weight:700;}
+  .flow-row p{color:var(--paper-dim);font-size:14.5px;line-height:1.6;}
+  @media (max-width:760px){.flow-row{grid-template-columns:1fr;gap:8px;}}
+
+  /* LOGS / testimonials */
+  .logs{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .log-card{
+    background:var(--ink-2);border:1px solid var(--line);border-radius:18px;padding:32px;
+    display:flex;flex-direction:column;gap:20px;
+  }
+  .log-meta{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--paper-dim);display:flex;justify-content:space-between;}
+  .log-meta .hr{color:var(--pulse);}
+  .log-card p{font-size:15px;line-height:1.6;}
+  .log-name{font-weight:700;font-size:14px;margin-top:auto;}
+  .log-role{color:var(--paper-dim);font-size:12.5px;}
+  @media (max-width:900px){.logs{grid-template-columns:1fr;}}
+
+  /* CTA */
+  .cta{
+    text-align:center;padding:160px 0;
+    border-top:1px solid var(--line);
+  }
+  .cta h2{font-size:clamp(36px,6vw,72px);text-transform:uppercase;line-height:1;max-width:900px;margin:0 auto 32px;}
+  .cta h2 span{color:var(--pulse);}
+  .cta-form{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:36px;}
+  .cta-input{
+    background:var(--ink-2);border:1px solid var(--line);border-radius:999px;
+    padding:15px 22px;color:var(--paper);font-family:'Inter';font-size:14.5px;min-width:280px;
+  }
+  .cta-input::placeholder{color:var(--paper-dim);}
+  .cta-input:focus{outline:2px solid var(--cyan);outline-offset:2px;}
+
+  footer{
+    border-top:1px solid var(--line);padding:44px 0;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+    color:var(--paper-dim);font-size:13px;
+  }
+  footer .logo{font-size:16px;}
+  .btn-primary:focus-visible, .btn-ghost:focus-visible, .nav-cta:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><span class="logo-dot"></span>TEMPO</div>
+  <div class="nav-links">
+    <a href="#blocks">Training</a>
+    <a href="#flow">How it works</a>
+    <a href="#logs">Athlete logs</a>
+  </div>
+  <a href="#join" class="nav-cta">Get Tempo</a>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <div class="eyebrow">Wearable · App · Coaching engine</div>
+    <h1 class="hero-title display">Train to your<br><span>own rhythm.</span></h1>
+    <p class="hero-sub">Tempo reads your heart rate, load, and recovery in real time, then adjusts today's session so every rep lands at the right intensity — not too easy, never too far.</p>
+    <div class="hero-actions">
+      <a href="#join" class="btn-primary">Get Tempo — $179 →</a>
+      <a href="#flow" class="btn-ghost">See how it works</a>
+    </div>
+  </div>
+  <div class="wave-holder">
+    <svg viewBox="0 0 1200 220" preserveAspectRatio="none">
+      <path class="wave-path" d="M0,140 L120,140 L150,60 L180,190 L210,140 L340,140 L370,100 L400,160 L430,140 L600,140 L630,50 L660,200 L690,140 L900,140 L930,90 L960,170 L990,140 L1200,140 L1320,140 L1350,60 L1380,190 L1410,140 L1600,140" />
+      <path class="wave-path cyan" d="M0,160 L100,160 L140,110 L180,190 L220,160 L500,160 L540,120 L580,180 L620,160 L900,160 L940,115 L980,185 L1020,160 L1200,160 L1300,160 L1340,110 L1380,190 L1420,160 L1600,160" />
+    </svg>
+  </div>
+</header>
+
+<div class="strip">
+  <div class="strip-track">
+    <div class="strip-item"><b>240ms</b> average sync latency</div>
+    <div class="strip-item"><b>98.2%</b> HR accuracy vs. chest strap</div>
+    <div class="strip-item"><b>11 days</b> battery on one charge</div>
+    <div class="strip-item"><b>60+</b> sports auto-detected</div>
+    <div class="strip-item"><b>1.4M</b> sessions coached last month</div>
+    <div class="strip-item"><b>240ms</b> average sync latency</div>
+    <div class="strip-item"><b>98.2%</b> HR accuracy vs. chest strap</div>
+    <div class="strip-item"><b>11 days</b> battery on one charge</div>
+    <div class="strip-item"><b>60+</b> sports auto-detected</div>
+    <div class="strip-item"><b>1.4M</b> sessions coached last month</div>
+  </div>
+</div>
+
+<section id="blocks">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Training blocks</div>
+      <h2 class="display">Three systems.<br>One rhythm.</h2>
+      <p>Everything Tempo does folds back into a single number: today's right effort.</p>
+    </div>
+    <div class="blocks">
+      <div class="block">
+        <div class="block-rep mono">SET 01 · SENSE</div>
+        <h3>Live heart-rate mapping</h3>
+        <p>An optical and ECG hybrid sensor reads your pulse 50 times a second, filtering out motion noise so the number on your wrist matches what's actually happening in your chest.</p>
+      </div>
+      <div class="block">
+        <div class="block-rep mono">SET 02 · ADAPT</div>
+        <h3>Rolling recovery score</h3>
+        <p>Sleep, resting heart rate, and yesterday's load feed a recovery score each morning. Tempo quietly reshapes today's targets around it — no manual logging required.</p>
+      </div>
+      <div class="block">
+        <div class="block-rep mono">SET 03 · PACE</div>
+        <h3>In-session pacing cues</h3>
+        <p>A single haptic pulse on your wrist means speed up, two means ease off. You keep your eyes on the road and your rhythm on target.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flow">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">How it works</div>
+      <h2 class="display">From wrist<br>to workout.</h2>
+    </div>
+    <div class="flow">
+      <div class="flow-row">
+        <div class="flow-tempo mono">01</div>
+        <h4>Strap in, no setup</h4>
+        <p>Tempo pairs in under a minute and starts learning your resting baseline from the first night you wear it.</p>
+      </div>
+      <div class="flow-row">
+        <div class="flow-tempo mono">02</div>
+        <h4>Get a target, not a guess</h4>
+        <p>Open any session and Tempo hands you a heart-rate zone and duration built from today's recovery, not a fixed plan from three weeks ago.</p>
+      </div>
+      <div class="flow-row">
+        <div class="flow-tempo mono">03</div>
+        <h4>Adjust mid-rep</h4>
+        <p>Drift outside your zone and a single haptic pulse nudges you back — you never have to check the screen to stay on pace.</p>
+      </div>
+      <div class="flow-row">
+        <div class="flow-tempo mono">04</div>
+        <h4>Close the loop overnight</h4>
+        <p>While you sleep, Tempo folds the session into your recovery model, so tomorrow's target already knows what today cost you.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="logs">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Athlete logs</div>
+      <h2 class="display">Real sessions,<br>real rhythm.</h2>
+    </div>
+    <div class="logs">
+      <div class="log-card">
+        <div class="log-meta"><span>Session log</span><span class="hr">142 bpm avg</span></div>
+        <p>I stopped needing a coach to tell me when to hold back. The wrist pulse does it mid-interval, before my legs would've told me anyway.</p>
+        <div>
+          <div class="log-name">Marta O.</div>
+          <div class="log-role">Half-marathon runner</div>
+        </div>
+      </div>
+      <div class="log-card">
+        <div class="log-meta"><span>Session log</span><span class="hr">96 bpm avg</span></div>
+        <p>The recovery score talked me out of a hard leg day twice this month. Both times it was right — I felt it in the next session.</p>
+        <div>
+          <div class="log-name">Deshawn R.</div>
+          <div class="log-role">Powerlifting coach</div>
+        </div>
+      </div>
+      <div class="log-card">
+        <div class="log-meta"><span>Session log</span><span class="hr">158 bpm avg</span></div>
+        <p>Auto-detect caught my ride before I even opened the app. First tracker that's kept up with a spin class instead of averaging it into mush.</p>
+        <div>
+          <div class="log-name">Ines V.</div>
+          <div class="log-role">Cycling instructor</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="join">
+  <div class="wrap">
+    <h2 class="display">Find your <span>tempo</span><br>this week.</h2>
+    <p style="color:var(--paper-dim);font-size:16px;max-width:440px;margin:0 auto;">14-day trial. Free returns. No plan changes required — just wear it.</p>
+    <form class="cta-form" onsubmit="event.preventDefault();">
+      <input class="cta-input" type="email" placeholder="you@email.com" aria-label="Email address" required>
+      <button type="submit" class="btn-primary">Reserve mine →</button>
+    </form>
+  </div>
+</section>
+
+<footer class="wrap">
+  <div class="logo"><span class="logo-dot"></span>TEMPO</div>
+  <div>© 2026 Tempo. Built for the next rep.</div>
+</footer>
+
+</body>
+</html>
