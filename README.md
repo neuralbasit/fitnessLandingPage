@@ -3,7 +3,7 @@
 A one-page landing site concept for Tempo, a fitness tracker that reads 
 heart rate and recovery in real time and paces workouts accordingly.
 
-🔗 Live site: https://YOUR_USERNAME.github.io/REPO_NAME/
+🔗 Live site: https://neuralbasit.github.io/fitnessLandingPage/
 
 Built with HTML/CSS/JS — no frameworks, no backend yet.
 
